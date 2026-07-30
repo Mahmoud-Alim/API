@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.10" />
+    <!-- Microsoft.OpenApi package removed to avoid conflicts with the OpenAPI source
+         generator used by Microsoft.AspNetCore.OpenApi. The generator brings the
+         appropriate Microsoft.OpenApi types; keeping a separate package reference
+         can cause type/version mismatches (e.g., read-only Example property).
+         If a direct dependency on Microsoft.OpenApi is required later, add a
+         compatible version that matches Microsoft.AspNetCore.OpenApi's expectation. -->
+    <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Application\Application.csproj" />
+    <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,51 @@
+{
+  "version": 2,
+  "dgSpecHash": "beTY+pPjLiQ=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Hp\\Downloads\\CleanArchitecture.API\\Application\\Application.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Hp\\.nuget\\packages\\fluentvalidation\\12.1.1\\fluentvalidation.12.1.1.nupkg.sha512",
+    "C:\\Users\\Hp\\.nuget\\packages\\fluentvalidation.dependencyinjectionextensions\\12.1.1\\fluentvalidation.dependencyinjectionextensions.12.1.1.nupkg.sha512",
+    "C:\\Users\\Hp\\.nuget\\packages\\mediatr\\14.2.0\\mediatr.14.2.0.nupkg.sha512",
+    "C:\\Users\\Hp\\.nuget\\packages\\mediatr.contracts\\2.0.1\\mediatr.contracts.2.0.1.nupkg.sha512",
+    "C:\\Users\\Hp\\.nuget\\packages\\microsoft.aspnetcore.identity.entityframeworkcore\\10.0.10\\microsoft.aspnetcore.identity.entityframeworkcore.10.0.10.nupkg.sha512",
+    "C:\\Users\\Hp\\.nuget\\packages\\microsoft.bcl.cryptography\\10.0.2\\microsoft.bcl.cryptography.10.0.2.nupkg.sha512",
+    "C:\\Users\\Hp\\.nuget\\packages\\microsoft.entityframeworkcore\\10.0.10\\microsoft.entityframeworkcore.10.0.10.nupkg.sha512",
+    "C:\\Users\\Hp\\.nuget\\packages\\microsoft.entityframeworkcore.abstractions\\10.0.10\\microsoft.entityframeworkcore.abstractions.10.0.10.nupkg.sha512",
+    "C:\\Users\\Hp\\.nuget\\packages\\microsoft.entityframeworkcore.analyzers\\10.0.10\\microsoft.entityframeworkcore.analyzers.10.0.10.nupkg.sha512",
+    "C:\\Users\\Hp\\.nuget\\packages\\microsoft.entityframeworkcore.relational\\10.0.10\\microsoft.entityframeworkcore.relational.10.0.10.nupkg.sha512",
+    "C:\\Users\\Hp\\.nuget\\packages\\microsoft.extensions.configuration\\10.0.10\\microsoft.extensions.configuration.10.0.10.nupkg.sha512",
+    "C:\\Users\\Hp\\.nuget\\packages\\microsoft.extensions.logging.abstractions\\10.0.10\\microsoft.extensions.logging.abstractions.10.0.10.nupkg.sha512",
+    "C:\\Users\\Hp\\.nuget\\packages\\microsoft.identitymodel.abstractions\\8.19.2\\microsoft.identitymodel.abstractions.8.19.2.nupkg.sha512",
+    "C:\\Users\\Hp\\.nuget\\packages\\microsoft.identitymodel.jsonwebtokens\\8.19.2\\microsoft.identitymodel.jsonwebtokens.8.19.2.nupkg.sha512",
+    "C:\\Users\\Hp\\.nuget\\packages\\microsoft.identitymodel.logging\\8.19.2\\microsoft.identitymodel.logging.8.19.2.nupkg.sha512",
+    "C:\\Users\\Hp\\.nuget\\packages\\microsoft.identitymodel.tokens\\8.19.2\\microsoft.identitymodel.tokens.8.19.2.nupkg.sha512",
+    "C:\\Users\\Hp\\.nuget\\packages\\system.identitymodel.tokens.jwt\\8.19.2\\system.identitymodel.tokens.jwt.8.19.2.nupkg.sha512"
+  ],
+  "logs": [
+    {
+      "code": "NU1510",
+      "level": "Warning",
+      "message": "PackageReference Microsoft.Extensions.Logging.Abstractions will not be pruned. This package is automatically available and does not need to be referenced explicitly. Remove the PackageReference item.",
+      "projectPath": "C:\\Users\\Hp\\Downloads\\CleanArchitecture.API\\Application\\Application.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Users\\Hp\\Downloads\\CleanArchitecture.API\\Application\\Application.csproj",
+      "libraryId": "Microsoft.Extensions.Logging.Abstractions",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    },
+    {
+      "code": "NU1510",
+      "level": "Warning",
+      "message": "PackageReference Microsoft.Extensions.Configuration will not be pruned. This package is automatically available and does not need to be referenced explicitly. Remove the PackageReference item.",
+      "projectPath": "C:\\Users\\Hp\\Downloads\\CleanArchitecture.API\\Application\\Application.csproj",
+      "warningLevel": 1,
+      "filePath": "C:\\Users\\Hp\\Downloads\\CleanArchitecture.API\\Application\\Application.csproj",
+      "libraryId": "Microsoft.Extensions.Configuration",
+      "targetGraphs": [
+        "net10.0"
+      ]
+    }
+  ]
+}
