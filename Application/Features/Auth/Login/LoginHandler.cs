@@ -2,10 +2,12 @@ using Application.Common.Models;
 using Application.Common.Models.Auth;
 using Domain.Entities;
 using Domain.Interfaces;
+using Domain.Settings;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace Application.Features.Auth.Login;
 
@@ -17,6 +19,7 @@ public sealed class LoginHandler : IRequestHandler<LoginCommand, Result<AuthResp
     private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly IAuditService _auditService;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly JwtSettings _jwtSettings;
     private readonly ILogger<LoginHandler> _logger;
 
     public LoginHandler(
@@ -26,6 +29,7 @@ public sealed class LoginHandler : IRequestHandler<LoginCommand, Result<AuthResp
         IRefreshTokenRepository refreshTokenRepository,
         IAuditService auditService,
         IHttpContextAccessor httpContextAccessor,
+        IOptions<JwtSettings> jwtSettings,
         ILogger<LoginHandler> logger)
     {
         _userManager = userManager;
@@ -34,6 +38,7 @@ public sealed class LoginHandler : IRequestHandler<LoginCommand, Result<AuthResp
         _refreshTokenRepository = refreshTokenRepository;
         _auditService = auditService;
         _httpContextAccessor = httpContextAccessor;
+        _jwtSettings = jwtSettings.Value;
         _logger = logger;
     }
 
@@ -92,7 +97,8 @@ public sealed class LoginHandler : IRequestHandler<LoginCommand, Result<AuthResp
             Id = Guid.NewGuid(),
             TokenHash = refreshTokenHash,
             UserId = user.Id,
-            ExpirationDate = DateTime.UtcNow.AddDays(7),
+            ExpirationDate = DateTime.UtcNow.AddDays(
+                _jwtSettings.RefreshTokenExpirationDays),
             CreatedDate = DateTime.UtcNow,
             CreatedByIp = ipAddress,
             IsRevoked = false
@@ -116,7 +122,8 @@ public sealed class LoginHandler : IRequestHandler<LoginCommand, Result<AuthResp
         var response = new AuthResponseDto
         {
             AccessToken = accessToken,
-            ExpirationTime = DateTime.UtcNow.AddMinutes(15),
+            ExpirationTime = DateTime.UtcNow.AddMinutes(
+                _jwtSettings.AccessTokenExpirationMinutes),
             RefreshToken = refreshTokenValue,
             UserId = user.Id,
             Username = user.UserName!,

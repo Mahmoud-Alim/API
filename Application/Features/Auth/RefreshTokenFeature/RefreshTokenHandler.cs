@@ -2,11 +2,12 @@ using Application.Common.Models;
 using Application.Common.Models.Auth;
 using Domain.Entities;
 using Domain.Interfaces;
+using Domain.Settings;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Options;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -21,7 +22,7 @@ public sealed class RefreshTokenHandler : IRequestHandler<RefreshTokenCommand, R
     private readonly IRefreshTokenRepository _refreshTokenRepository;
     private readonly IAuditService _auditService;
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IConfiguration _configuration;
+    private readonly JwtSettings _jwtSettings;
     private readonly ILogger<RefreshTokenHandler> _logger;
 
     public RefreshTokenHandler(
@@ -30,7 +31,7 @@ public sealed class RefreshTokenHandler : IRequestHandler<RefreshTokenCommand, R
         IRefreshTokenRepository refreshTokenRepository,
         IAuditService auditService,
         IHttpContextAccessor httpContextAccessor,
-        IConfiguration configuration,
+        IOptions<JwtSettings> jwtSettings,
         ILogger<RefreshTokenHandler> logger)
     {
         _userManager = userManager;
@@ -38,7 +39,7 @@ public sealed class RefreshTokenHandler : IRequestHandler<RefreshTokenCommand, R
         _refreshTokenRepository = refreshTokenRepository;
         _auditService = auditService;
         _httpContextAccessor = httpContextAccessor;
-        _configuration = configuration;
+        _jwtSettings = jwtSettings.Value;
         _logger = logger;
     }
 
@@ -97,7 +98,8 @@ public sealed class RefreshTokenHandler : IRequestHandler<RefreshTokenCommand, R
             Id = Guid.NewGuid(),
             TokenHash = newRefreshTokenHash,
             UserId = userId,
-            ExpirationDate = DateTime.UtcNow.AddDays(7),
+            ExpirationDate = DateTime.UtcNow.AddDays(
+                _jwtSettings.RefreshTokenExpirationDays),
             CreatedDate = DateTime.UtcNow,
             CreatedByIp = ipAddress,
             ReplacedByTokenHash = storedRefreshToken.TokenHash,
@@ -125,7 +127,8 @@ public sealed class RefreshTokenHandler : IRequestHandler<RefreshTokenCommand, R
         var response = new AuthResponseDto
         {
             AccessToken = newAccessToken,
-            ExpirationTime = DateTime.UtcNow.AddMinutes(15),
+            ExpirationTime = DateTime.UtcNow.AddMinutes(
+                _jwtSettings.AccessTokenExpirationMinutes),
             RefreshToken = newRefreshTokenValue,
             UserId = user.Id,
             Username = user.UserName!,
@@ -145,10 +148,10 @@ public sealed class RefreshTokenHandler : IRequestHandler<RefreshTokenCommand, R
             ValidateIssuerSigningKey = true,
             ValidateLifetime = false,
             RequireSignedTokens = true,
-            ValidIssuer = _configuration["Jwt:Issuer"],
-            ValidAudience = _configuration["Jwt:Audience"],
+            ValidIssuer = _jwtSettings.Issuer,
+            ValidAudience = _jwtSettings.Audience,
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(_configuration["Jwt:SecretKey"] ?? throw new InvalidOperationException("JWT secret key is not configured"))),
+                Encoding.UTF8.GetBytes(_jwtSettings.SecretKey)),
             ClockSkew = TimeSpan.Zero
         };
 

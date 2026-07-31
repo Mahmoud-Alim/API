@@ -1,5 +1,6 @@
 using API.Constants;
 using API.Middleware;
+using Domain.Settings;
 using Application.Common.Models.Auth;
 using Application.Features.Auth.Register;
 using Application.Features.Auth.Login;
@@ -12,6 +13,7 @@ using Application.Features.Roles.GetUserRoles;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace API.Controllers;
 
@@ -21,9 +23,12 @@ public sealed class AuthController : ControllerBase
 {
     private readonly IMediator _mediator;
 
-    public AuthController(IMediator mediator)
+    private readonly JwtSettings _jwtSettings;
+
+    public AuthController(IMediator mediator, IOptions<JwtSettings> jwtSettings)
     {
         _mediator = mediator;
+        _jwtSettings = jwtSettings.Value;
     }
 
     [HttpPost(RouteConstants.Auth.Register)]
@@ -80,7 +85,8 @@ public sealed class AuthController : ControllerBase
                 HttpOnly = true,
                 Secure = true,
                 SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddDays(7)
+                Expires = DateTime.UtcNow.AddDays(
+                    _jwtSettings.RefreshTokenExpirationDays)
             };
 
             Response.Cookies.Append("refreshToken", result.Data.RefreshToken, cookieOptions);
@@ -116,7 +122,8 @@ public sealed class AuthController : ControllerBase
                 HttpOnly = true,
                 Secure = true,
                 SameSite = SameSiteMode.Strict,
-                Expires = DateTime.UtcNow.AddDays(7)
+                Expires = DateTime.UtcNow.AddDays(
+                    _jwtSettings.RefreshTokenExpirationDays)
             };
 
             Response.Cookies.Append("refreshToken", result.Data.RefreshToken, cookieOptions);
