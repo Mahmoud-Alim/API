@@ -74,7 +74,7 @@ public sealed class RegisterHandler : IRequestHandler<RegisterCommand, Result<Au
 
         var ipAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? "unknown";
 
-        var refreshToken = new Domain.Entities.RefreshToken
+        var refreshToken = new RefreshToken
         {
             Id = Guid.NewGuid(),
             TokenHash = refreshTokenHash,

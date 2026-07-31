@@ -12,7 +12,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Application.Features.Auth.RefreshToken;
+namespace Application.Features.Auth.RefreshTokenFeature;
 
 public sealed class RefreshTokenHandler : IRequestHandler<RefreshTokenCommand, Result<AuthResponseDto>>
 {
@@ -92,7 +92,7 @@ public sealed class RefreshTokenHandler : IRequestHandler<RefreshTokenCommand, R
         var newRefreshTokenValue = _tokenService.GenerateRefreshToken();
         var newRefreshTokenHash = _tokenService.HashToken(newRefreshTokenValue);
 
-        var newRefreshToken = new Domain.Entities.RefreshToken
+        var newRefreshToken = new RefreshToken
         {
             Id = Guid.NewGuid(),
             TokenHash = newRefreshTokenHash,

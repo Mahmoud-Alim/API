@@ -1,8 +1,9 @@
+using API.Constants;
 using API.Middleware;
 using Application.Common.Models.Auth;
 using Application.Features.Auth.Register;
 using Application.Features.Auth.Login;
-using Application.Features.Auth.RefreshToken;
+using Application.Features.Auth.RefreshTokenFeature;
 using Application.Features.Auth.RevokeToken;
 using Application.Features.Roles.AddRole;
 using Application.Features.Roles.RemoveRole;
@@ -15,7 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace API.Controllers;
 
 [ApiController]
-[Route("api/v1/auth")]
+[Route(RouteConstants.Auth.Base)]
 public sealed class AuthController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -25,7 +26,7 @@ public sealed class AuthController : ControllerBase
         _mediator = mediator;
     }
 
-    [HttpPost("register")]
+    [HttpPost(RouteConstants.Auth.Register)]
     [AllowAnonymous]
     [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -51,7 +52,7 @@ public sealed class AuthController : ControllerBase
         return result.ToCreatedActionResult(this, nameof(Login), new { });
     }
 
-    [HttpPost("login")]
+    [HttpPost(RouteConstants.Auth.Login)]
     [AllowAnonymous]
     [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -88,7 +89,7 @@ public sealed class AuthController : ControllerBase
         return result.ToActionResult(this);
     }
 
-    [HttpPost("refresh-token")]
+    [HttpPost(RouteConstants.Auth.RefreshToken)]
     [AllowAnonymous]
     [ProducesResponseType(typeof(AuthResponseDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -124,7 +125,7 @@ public sealed class AuthController : ControllerBase
         return result.ToActionResult(this);
     }
 
-    [HttpPost("revoke-token")]
+    [HttpPost(RouteConstants.Auth.Logout)]
     [Authorize]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

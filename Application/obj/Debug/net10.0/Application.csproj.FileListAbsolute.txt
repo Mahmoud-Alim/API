@@ -13,3 +13,4 @@ C:\Users\Hp\Downloads\CleanArchitecture.API\Application\obj\Debug\net10.0\ref\Ap
 C:\Users\Hp\Downloads\CleanArchitecture.API\Application\bin\Debug\net10.0\Domain.dll
 C:\Users\Hp\Downloads\CleanArchitecture.API\Application\bin\Debug\net10.0\Domain.pdb
 C:\Users\Hp\Downloads\CleanArchitecture.API\Application\obj\Debug\net10.0\Applicat.44B5EDA2.Up2Date
+C:\Users\Hp\Downloads\CleanArchitecture.API\Application\obj\Debug\net10.0\Application.sourcelink.json

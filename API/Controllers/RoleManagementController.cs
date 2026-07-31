@@ -1,3 +1,4 @@
+using API.Constants;
 using API.Middleware;
 using Application.Common.Models.Auth;
 using Application.Features.Roles.AddRole;
@@ -11,7 +12,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace API.Controllers;
 
 [ApiController]
-[Route("api/v1/roles")]
+[Route(RouteConstants.Roles.Base)]
 [Authorize(Policy = "RequireAdminRole")]
 public sealed class RoleManagementController : ControllerBase
 {
@@ -22,7 +23,7 @@ public sealed class RoleManagementController : ControllerBase
         _mediator = mediator;
     }
 
-    [HttpPost("promote-admin/{userId}")]
+    [HttpPost(RouteConstants.Roles.PromoteAdmin)]
     [Authorize(Policy = "RequireBossRole")]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -38,7 +39,7 @@ public sealed class RoleManagementController : ControllerBase
         return result.ToActionResult(this);
     }
 
-    [HttpPost("add")]
+    [HttpPost(RouteConstants.Roles.Add)]
     [Authorize(Policy = "RequireBossRole")]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -52,7 +53,7 @@ public sealed class RoleManagementController : ControllerBase
         return result.ToActionResult(this);
     }
 
-    [HttpDelete("remove")]
+    [HttpDelete(RouteConstants.Roles.Remove)]
     [Authorize(Policy = "RequireBossRole")]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -67,7 +68,7 @@ public sealed class RoleManagementController : ControllerBase
         return result.ToActionResult(this);
     }
 
-    [HttpGet("{userId}")]
+    [HttpGet(RouteConstants.Roles.GetUserRoles)]
     [Authorize(Policy = "RequireAdminRole")]
     [ProducesResponseType(typeof(UserRoleDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]

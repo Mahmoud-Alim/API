@@ -2,7 +2,7 @@ using Application.Common.Models;
 using Application.Common.Models.Auth;
 using MediatR;
 
-namespace Application.Features.Auth.RefreshToken;
+namespace Application.Features.Auth.RefreshTokenFeature;
 
 public sealed record RefreshTokenCommand : IRequest<Result<AuthResponseDto>>
 {
