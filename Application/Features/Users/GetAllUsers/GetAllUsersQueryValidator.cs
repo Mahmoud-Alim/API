@@ -26,7 +26,6 @@ public sealed class GetAllUsersQueryValidator : AbstractValidator<GetAllUsersQue
                            sortBy.Equals("Active", StringComparison.OrdinalIgnoreCase))
             .WithMessage("SortBy must be one of: UserId, FirstName, LastName, Email, Gender, Active.");
 
-        // --- Filter validation ---
         When(x => !string.IsNullOrWhiteSpace(x.SearchTerm), () =>
         {
             RuleFor(x => x.SearchTerm!)

@@ -4,15 +4,14 @@ using System.Threading.RateLimiting;
 using API.Constants;
 using API.Middleware;
 using API.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
-using Microsoft.Extensions.Configuration;
 using Serilog;
 
 namespace API;
 
 public static class DependencyInjection
 {
-    /// <summary>Name of the CORS policy registered by <see cref="AddCorsServices"/>.</summary>
     public const string CorsPolicyName = "CorsPolicy";
 
     private const string UserIdClaimType = ClaimTypes.NameIdentifier;
@@ -27,10 +26,6 @@ public static class DependencyInjection
         DictionaryKeyPolicy = JsonNamingPolicy.CamelCase
     };
 
-    /// <summary>
-    /// Registers all presentation-layer services: MVC, OpenAPI, HttpContextAccessor,
-    /// Forwarded Headers, CORS and the Token Bucket Rate Limiter.
-    /// </summary>
     public static IServiceCollection AddPresentationServices(
         this IServiceCollection services,
         IConfiguration configuration)
@@ -39,6 +34,13 @@ public static class DependencyInjection
         services.AddOpenApi();
         services.AddHttpContextAccessor();
 
+        services.AddAuthorization(options =>
+        {
+            options.FallbackPolicy = new AuthorizationPolicyBuilder()
+                .RequireAuthenticatedUser()
+                .Build();
+        });
+
         services.AddForwardedHeadersServices();
         services.AddCorsServices(configuration);
         services.AddRateLimiterServices();
@@ -46,11 +48,6 @@ public static class DependencyInjection
         return services;
     }
 
-    /// <summary>
-    /// Registers the presentation-layer middleware pipeline: Forwarded Headers,
-    /// exception handling, Serilog request logging, routing, CORS, authentication,
-    /// rate limiting and authorization.
-    /// </summary>
     public static IApplicationBuilder UsePresentationServices(this IApplicationBuilder app)
     {
         app.UseForwardedHeaders();
@@ -72,14 +69,11 @@ public static class DependencyInjection
         return app;
     }
 
-    /// <summary>
-    /// Maps presentation endpoints (controllers and development-only OpenAPI).
-    /// </summary>
     public static WebApplication MapPresentationEndpoints(this WebApplication app)
     {
         if (app.Environment.IsDevelopment())
         {
-            app.MapOpenApi();
+            app.MapOpenApi().AllowAnonymous();
         }
 
         app.MapControllers();
@@ -105,11 +99,6 @@ public static class DependencyInjection
         return services;
     }
 
-    /// <summary>
-    /// Registers the "CorsPolicy" CORS policy. Allowed origins are read from the
-    /// "Cors" section of appsettings.json. All methods and headers are allowed.
-    /// Credentials are enabled only when configured AND no wildcard origin is used.
-    /// </summary>
     private static IServiceCollection AddCorsServices(
         this IServiceCollection services,
         IConfiguration configuration)

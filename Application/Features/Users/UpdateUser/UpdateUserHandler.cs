@@ -5,21 +5,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.Features.Users.UpdateUser;
 
-/// <summary>
-/// Handler for <see cref="UpdateUserCommand"/> that updates an existing user.
-/// </summary>
 public sealed class UpdateUserHandler : IRequestHandler<UpdateUserCommand, Result<UserDto>>
 {
     private readonly IUserRepository _userRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<UpdateUserHandler> _logger;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="UpdateUserHandler"/> class.
-    /// </summary>
-    /// <param name="userRepository">The user repository.</param>
-    /// <param name="unitOfWork">The unit of work for transactional integrity.</param>
-    /// <param name="logger">The logger instance.</param>
     public UpdateUserHandler(
         IUserRepository userRepository,
         IUnitOfWork unitOfWork,
@@ -30,7 +21,6 @@ public sealed class UpdateUserHandler : IRequestHandler<UpdateUserCommand, Resul
         _logger = logger;
     }
 
-    /// <inheritdoc />
     public async Task<Result<UserDto>> Handle(
         UpdateUserCommand request,
         CancellationToken cancellationToken)

@@ -5,26 +5,17 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.Features.Users.GetUserSalary;
 
-/// <summary>
-/// Handler for <see cref="GetUserSalaryQuery"/> that retrieves a user's salary information.
-/// </summary>
 public sealed class GetUserSalaryHandler : IRequestHandler<GetUserSalaryQuery, Result<UserSalaryDto>>
 {
     private readonly IUserRepository _userRepository;
     private readonly ILogger<GetUserSalaryHandler> _logger;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="GetUserSalaryHandler"/> class.
-    /// </summary>
-    /// <param name="userRepository">The user repository.</param>
-    /// <param name="logger">The logger instance.</param>
     public GetUserSalaryHandler(IUserRepository userRepository, ILogger<GetUserSalaryHandler> logger)
     {
         _userRepository = userRepository;
         _logger = logger;
     }
 
-    /// <inheritdoc />
     public async Task<Result<UserSalaryDto>> Handle(
         GetUserSalaryQuery request,
         CancellationToken cancellationToken)

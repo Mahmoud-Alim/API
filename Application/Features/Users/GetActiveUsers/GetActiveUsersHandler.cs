@@ -16,7 +16,6 @@ public sealed class GetActiveUsersHandler : IRequestHandler<GetActiveUsersQuery,
         _logger = logger;
     }
 
-    /// <inheritdoc />
     public async Task<Result<IReadOnlyList<UserDto>>> Handle(
         GetActiveUsersQuery request,
         CancellationToken cancellationToken)

@@ -23,7 +23,6 @@ public sealed class ExceptionMiddleware
         }
         catch (Exception ex)
         {
-            // Prevent response tampering if headers have already been sent.
             if (context.Response.HasStarted)
             {
                 _logger.LogWarning(
@@ -105,7 +104,6 @@ public sealed class ExceptionMiddleware
                 break;
 
             default:
-                // Unexpected / infrastructure error — keep detail opaque to the client.
                 problemDetails.Status = StatusCodes.Status500InternalServerError;
                 problemDetails.Title = "Internal Server Error";
                 problemDetails.Detail = "An unexpected error occurred. Please try again later.";

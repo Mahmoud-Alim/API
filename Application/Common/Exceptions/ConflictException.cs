@@ -1,10 +1,5 @@
 namespace Application.Common.Exceptions;
 
-/// <summary>
-/// Represents an HTTP 409 Conflict error, typically thrown by infrastructure
-/// or data layers for unexpected concurrency/conflict scenarios.
-/// Business logic should use <c>Result.Failure</c> instead.
-/// </summary>
 public sealed class ConflictException : Exception
 {
     public ConflictException()

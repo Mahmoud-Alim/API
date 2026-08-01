@@ -14,10 +14,6 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <!-- Added explicit Microsoft.OpenApi to promote a non-vulnerable version for
-         transitive dependencies. This overrides older transitive versions and
-         addresses known vulnerabilities. Keep this reference minimal and
-         aligned with Microsoft.AspNetCore.OpenApi. -->
     <PackageReference Include="Microsoft.OpenApi" Version="2.7.5" />
     <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.19.2" />

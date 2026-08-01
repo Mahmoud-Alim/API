@@ -6,10 +6,6 @@ using Application.Features.Auth.Register;
 using Application.Features.Auth.Login;
 using Application.Features.Auth.RefreshTokenFeature;
 using Application.Features.Auth.RevokeToken;
-using Application.Features.Roles.AddRole;
-using Application.Features.Roles.RemoveRole;
-using Application.Features.Roles.PromoteUser;
-using Application.Features.Roles.GetUserRoles;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -133,7 +129,6 @@ public sealed class AuthController : ControllerBase
     }
 
     [HttpPost(RouteConstants.Auth.Logout)]
-    [Authorize]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<bool>> RevokeToken(

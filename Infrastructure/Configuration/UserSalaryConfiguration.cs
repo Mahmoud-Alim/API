@@ -16,9 +16,5 @@ public class UserSalaryConfiguration : IEntityTypeConfiguration<UserSalary>
                .HasColumnType("decimal(18,2)")
                .IsRequired();
 
-        //builder.HasOne<User>()
-        //       .WithOne()
-        //       .HasForeignKey<UserSalary>(x => x.UserId)
-        //       .OnDelete(DeleteBehavior.Cascade);
     }
 }

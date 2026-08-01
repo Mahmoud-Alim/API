@@ -2,14 +2,8 @@ using FluentValidation;
 
 namespace Application.Features.Users.UpdateUser;
 
-/// <summary>
-/// Validator for the <see cref="UpdateUserCommand"/>.
-/// </summary>
 public sealed class UpdateUserValidator : AbstractValidator<UpdateUserCommand>
 {
-    /// <summary>
-    /// Initializes a new instance of the <see cref="UpdateUserValidator"/> class.
-    /// </summary>
     public UpdateUserValidator()
     {
         RuleFor(x => x.Id)

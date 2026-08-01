@@ -21,9 +21,5 @@ public class UserJobInfoConfiguration : IEntityTypeConfiguration<UserJobInfo>
                .IsRequired()
                .HasMaxLength(100);
 
-        //builder.HasOne<User>()
-        //       .WithOne()
-        //       .HasForeignKey<UserJobInfo>(x => x.UserId)
-        //       .OnDelete(DeleteBehavior.Cascade);
     }
 }

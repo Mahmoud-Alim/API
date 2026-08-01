@@ -47,8 +47,6 @@ public static class DependencyInjection
         var jwtSettings = configuration.GetSection("Jwt").Get<JwtSettings>()
             ?? throw new InvalidOperationException("JWT settings are not configured.");
 
-        // Fail fast with a clear message instead of the cryptic
-        // "IDX10703: key length is zero" thrown by SymmetricSecurityKey.
         ValidateJwtSettings(jwtSettings);
 
         services.AddAuthentication(options =>
@@ -119,24 +117,12 @@ public static class DependencyInjection
         return services;
     }
 
-    /// <summary>
-    /// Resolves a named <see cref="ILogger"/> for JwtBearer events.
-    /// The non-generic <c>ILogger</c> is not registered by the logging host
-    /// (only <c>ILogger<T></c> and <c>ILoggerFactory</c> are), so we
-    /// create one from the factory to avoid a runtime
-    /// <see cref="InvalidOperationException"/> when a challenge fires.
-    /// </summary>
     private static ILogger GetJwtLogger(IServiceProvider services)
     {
         var factory = services.GetRequiredService<ILoggerFactory>();
         return factory.CreateLogger("JwtBearer");
     }
 
-    /// <summary>
-    /// Ensures all JWT settings are present and valid before they are used to
-    /// build the signing key. Without this, an empty secret produces the
-    /// confusing "IDX10703: key length is zero" at the first request.
-    /// </summary>
     private static void ValidateJwtSettings(JwtSettings settings)
     {
         if (string.IsNullOrWhiteSpace(settings.SecretKey))

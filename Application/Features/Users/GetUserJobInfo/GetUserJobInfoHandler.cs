@@ -5,26 +5,17 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.Features.Users.GetUserJobInfo;
 
-/// <summary>
-/// Handler for <see cref="GetUserJobInfoQuery"/> that retrieves a user's job information.
-/// </summary>
 public sealed class GetUserJobInfoHandler : IRequestHandler<GetUserJobInfoQuery, Result<UserJobInfoDto>>
 {
     private readonly IUserRepository _userRepository;
     private readonly ILogger<GetUserJobInfoHandler> _logger;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="GetUserJobInfoHandler"/> class.
-    /// </summary>
-    /// <param name="userRepository">The user repository.</param>
-    /// <param name="logger">The logger instance.</param>
     public GetUserJobInfoHandler(IUserRepository userRepository, ILogger<GetUserJobInfoHandler> logger)
     {
         _userRepository = userRepository;
         _logger = logger;
     }
 
-    /// <inheritdoc />
     public async Task<Result<UserJobInfoDto>> Handle(
         GetUserJobInfoQuery request,
         CancellationToken cancellationToken)
