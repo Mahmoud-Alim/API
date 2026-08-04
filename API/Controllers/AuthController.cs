@@ -85,7 +85,7 @@ public sealed class AuthController : ControllerBase
                     _jwtSettings.RefreshTokenExpirationDays)
             };
 
-            Response.Cookies.Append("refreshToken", result.Data.RefreshToken, cookieOptions);
+            Response.Cookies.Append(ApiHeaders.RefreshToken, result.Data.RefreshToken, cookieOptions);
         }
 
         return result.ToActionResult(this);
@@ -122,7 +122,7 @@ public sealed class AuthController : ControllerBase
                     _jwtSettings.RefreshTokenExpirationDays)
             };
 
-            Response.Cookies.Append("refreshToken", result.Data.RefreshToken, cookieOptions);
+            Response.Cookies.Append(ApiHeaders.RefreshToken, result.Data.RefreshToken, cookieOptions);
         }
 
         return result.ToActionResult(this);
@@ -134,7 +134,7 @@ public sealed class AuthController : ControllerBase
     public async Task<ActionResult<bool>> RevokeToken(
         CancellationToken cancellationToken)
     {
-        var refreshToken = Request.Cookies["refreshToken"];
+        var refreshToken = Request.Cookies[ApiHeaders.RefreshToken];
 
         if (string.IsNullOrEmpty(refreshToken))
         {
@@ -142,7 +142,7 @@ public sealed class AuthController : ControllerBase
             {
                 Status = StatusCodes.Status400BadRequest,
                 Title = "Bad Request",
-                Detail = "No refresh token found in cookies."
+                Detail = ApiErrors.NoRefreshToken
             });
         }
 

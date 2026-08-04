@@ -5,6 +5,7 @@ using Application.Features.Roles.AddRole;
 using Application.Features.Roles.RemoveRole;
 using Application.Features.Roles.PromoteUser;
 using Application.Features.Roles.GetUserRoles;
+using Domain.Constants;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -13,7 +14,7 @@ namespace API.Controllers;
 
 [ApiController]
 [Route(RouteConstants.Roles.Base)]
-[Authorize(Policy = "RequireAdminRole")]
+[Authorize(Policy = AuthPolicies.RequireAdminRole)]
 public sealed class RoleManagementController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -24,7 +25,7 @@ public sealed class RoleManagementController : ControllerBase
     }
 
     [HttpPost(RouteConstants.Roles.PromoteAdmin)]
-    [Authorize(Policy = "RequireBossRole")]
+    [Authorize(Policy = AuthPolicies.RequireBossRole)]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -40,7 +41,7 @@ public sealed class RoleManagementController : ControllerBase
     }
 
     [HttpPost(RouteConstants.Roles.Add)]
-    [Authorize(Policy = "RequireBossRole")]
+    [Authorize(Policy = AuthPolicies.RequireBossRole)]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status409Conflict)]
@@ -54,7 +55,7 @@ public sealed class RoleManagementController : ControllerBase
     }
 
     [HttpDelete(RouteConstants.Roles.Remove)]
-    [Authorize(Policy = "RequireBossRole")]
+    [Authorize(Policy = AuthPolicies.RequireBossRole)]
     [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -69,7 +70,7 @@ public sealed class RoleManagementController : ControllerBase
     }
 
     [HttpGet(RouteConstants.Roles.GetUserRoles)]
-    [Authorize(Policy = "RequireAdminRole")]
+    [Authorize(Policy = AuthPolicies.RequireAdminRole)]
     [ProducesResponseType(typeof(UserRoleDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<UserRoleDto>> GetUserRoles(

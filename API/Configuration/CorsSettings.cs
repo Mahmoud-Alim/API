@@ -1,4 +1,4 @@
-namespace API.Models;
+namespace API.Configuration;
 
 public sealed class CorsSettings
 {
@@ -8,4 +8,3 @@ public sealed class CorsSettings
 
     public bool AllowCredentials { get; init; }
 }
-

@@ -1,6 +1,7 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Domain.Constants;
 using Domain.Interfaces;
 using Domain.Settings;
 using Microsoft.Extensions.Options;
@@ -28,7 +29,7 @@ public sealed class JwtTokenService : ITokenService
             new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
             new Claim(JwtRegisteredClaimNames.UniqueName, username),
             new Claim(JwtRegisteredClaimNames.Email, email),
-            new Claim("securityStamp", Guid.NewGuid().ToString())
+            new Claim(TokenClaimTypes.SecurityStamp, Guid.NewGuid().ToString())
         };
 
         foreach (var role in roles)
@@ -46,9 +47,9 @@ public sealed class JwtTokenService : ITokenService
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
 
-    public string GenerateRefreshToken()
+public string GenerateRefreshToken()
     {
-        var randomBytes = new byte[64];
+        var randomBytes = new byte[TokenConstants.RefreshTokenByteLength];
         using var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
         rng.GetBytes(randomBytes);
         return Convert.ToBase64String(randomBytes);

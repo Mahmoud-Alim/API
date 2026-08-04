@@ -1,4 +1,6 @@
 using System.Diagnostics;
+using API.Constants;
+using API.Json;
 using Application.Common.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 
@@ -46,10 +48,10 @@ public sealed class ExceptionMiddleware
 
         switch (exception)
         {
-            case ValidationException validationEx:
+case ValidationException validationEx:
                 problemDetails.Status = StatusCodes.Status400BadRequest;
                 problemDetails.Title = "Validation Failed";
-                problemDetails.Detail = "One or more validation errors occurred.";
+                problemDetails.Detail = ApiErrors.ValidationFailed;
                 problemDetails.Extensions["errors"] = validationEx.Errors;
 
                 _logger.LogWarning(
@@ -73,7 +75,7 @@ public sealed class ExceptionMiddleware
             case UnauthorizedAccessException:
                 problemDetails.Status = StatusCodes.Status401Unauthorized;
                 problemDetails.Title = "Unauthorized";
-                problemDetails.Detail = "You are not authorized to access this resource.";
+                problemDetails.Detail = ApiErrors.Unauthorized;
 
                 _logger.LogWarning(
                     exception,
@@ -84,7 +86,7 @@ public sealed class ExceptionMiddleware
             case ForbiddenException:
                 problemDetails.Status = StatusCodes.Status403Forbidden;
                 problemDetails.Title = "Forbidden";
-                problemDetails.Detail = "You do not have permission to access this resource.";
+                problemDetails.Detail = ApiErrors.Forbidden;
 
                 _logger.LogWarning(
                     exception,
@@ -106,7 +108,7 @@ public sealed class ExceptionMiddleware
             default:
                 problemDetails.Status = StatusCodes.Status500InternalServerError;
                 problemDetails.Title = "Internal Server Error";
-                problemDetails.Detail = "An unexpected error occurred. Please try again later.";
+                problemDetails.Detail = ApiErrors.UnexpectedError;
 
                 _logger.LogError(
                     exception,
@@ -117,7 +119,7 @@ public sealed class ExceptionMiddleware
         }
 
         context.Response.StatusCode = problemDetails.Status!.Value;
-        context.Response.ContentType = "application/problem+json";
+        context.Response.ContentType = ApiHeaders.ProblemJsonContentType;
 
         await context.Response.WriteAsJsonAsync(
             problemDetails,
@@ -125,14 +127,3 @@ public sealed class ExceptionMiddleware
             context.RequestAborted);
     }
 }
-
-internal static class JsonSerializerOptionsProvider
-{
-    public static readonly System.Text.Json.JsonSerializerOptions Default = new()
-    {
-        PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
-        DictionaryKeyPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
-        WriteIndented = false
-    };
-}
-

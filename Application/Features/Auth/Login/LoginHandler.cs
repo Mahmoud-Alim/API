@@ -1,5 +1,6 @@
 using Application.Common.Models;
 using Application.Common.Models.Auth;
+using Domain.Constants;
 using Domain.Entities;
 using Domain.Interfaces;
 using Domain.Settings;
@@ -50,22 +51,22 @@ public sealed class LoginHandler : IRequestHandler<LoginCommand, Result<AuthResp
 
         var user = await _userManager.FindByEmailAsync(request.Email);
 
-        if (user is null)
+if (user is null)
         {
             _logger.LogWarning("Login failed: no user found with email {Email}", request.Email);
-            return Result<AuthResponseDto>.Failure("Invalid credentials.", 401);
+            return Result<AuthResponseDto>.Failure(ErrorMessages.InvalidCredentials, StatusCodes.Status401Unauthorized);
         }
 
         if (!user.IsActive)
         {
             _logger.LogWarning("Login failed: user {Email} is inactive", request.Email);
-            return Result<AuthResponseDto>.Failure("User account is not active.", 403);
+            return Result<AuthResponseDto>.Failure(ErrorMessages.UserInactive, StatusCodes.Status403Forbidden);
         }
 
         if (user.LockoutEnabled && user.LockoutEnd.HasValue && user.LockoutEnd.Value > DateTimeOffset.UtcNow)
         {
             _logger.LogWarning("Login failed: user {Email} is locked out", request.Email);
-            return Result<AuthResponseDto>.Failure("User account is locked out.", 403);
+            return Result<AuthResponseDto>.Failure(ErrorMessages.UserLockedOut, StatusCodes.Status403Forbidden);
         }
 
         var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, lockoutOnFailure: true);
@@ -73,7 +74,7 @@ public sealed class LoginHandler : IRequestHandler<LoginCommand, Result<AuthResp
         if (!result.Succeeded)
         {
             _logger.LogWarning("Login failed: invalid password for email {Email}", request.Email);
-            return Result<AuthResponseDto>.Failure("Invalid credentials.", 401);
+            return Result<AuthResponseDto>.Failure(ErrorMessages.InvalidCredentials, StatusCodes.Status401Unauthorized);
         }
 
         var roles = await _userManager.GetRolesAsync(user);
@@ -81,7 +82,7 @@ public sealed class LoginHandler : IRequestHandler<LoginCommand, Result<AuthResp
         var refreshTokenValue = _tokenService.GenerateRefreshToken();
         var refreshTokenHash = _tokenService.HashToken(refreshTokenValue);
 
-        var ipAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+var ipAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? ErrorMessages.UnknownIp;
 
         var existingTokens = await _refreshTokenRepository.GetByUserIdAsync(user.Id, cancellationToken);
         if (existingTokens is not null)
@@ -109,8 +110,8 @@ public sealed class LoginHandler : IRequestHandler<LoginCommand, Result<AuthResp
 
         await _auditService.LogAsync(
             user.Id,
-            "UserLogin",
-            "ApplicationUser",
+            AuditActions.UserLogin,
+            EntityNames.ApplicationUser,
             user.Id.ToString(),
             null,
             $"User {user.Email} logged in",

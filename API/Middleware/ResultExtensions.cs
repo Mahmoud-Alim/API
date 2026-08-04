@@ -1,3 +1,4 @@
+using API.Constants;
 using Application.Common.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,13 +15,15 @@ public static class ResultExtensions
                 : controller.Ok(result.Data);
         }
 
-        var statusCode = result.StatusCode > 0 ? result.StatusCode : 400;
+        var statusCode = result.StatusCode > 0
+            ? result.StatusCode
+            : StatusCodes.Status400BadRequest;
 
         var problemDetails = new ProblemDetails
         {
             Status = statusCode,
             Title = GetDefaultTitleForStatusCode(statusCode),
-            Detail = result.Error ?? "An error occurred.",
+            Detail = result.Error ?? ApiErrors.AnErrorOccurred,
             Instance = controller.Request?.Path
         };
 
@@ -39,14 +42,13 @@ public static class ResultExtensions
 
     private static string GetDefaultTitleForStatusCode(int statusCode) => statusCode switch
     {
-        400 => "Bad Request",
-        401 => "Unauthorized",
-        403 => "Forbidden",
-        404 => "Not Found",
-        409 => "Conflict",
-        422 => "Unprocessable Entity",
-        500 => "Internal Server Error",
+        StatusCodes.Status400BadRequest => "Bad Request",
+        StatusCodes.Status401Unauthorized => "Unauthorized",
+        StatusCodes.Status403Forbidden => "Forbidden",
+        StatusCodes.Status404NotFound => "Not Found",
+        StatusCodes.Status409Conflict => "Conflict",
+        StatusCodes.Status422UnprocessableEntity => "Unprocessable Entity",
+        StatusCodes.Status500InternalServerError => "Internal Server Error",
         _ => "Error"
     };
 }
-

@@ -1,6 +1,8 @@
+using Domain.Constants;
 using Domain.Entities;
 using Domain.Interfaces;
 using Domain.Settings;
+using Infrastructure.Configuration;
 using Infrastructure.IdentityHelper;
 using Infrastructure.implementation;
 using Infrastructure.Services;
@@ -22,32 +24,44 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.Configure<JwtSettings>(configuration.GetSection("Jwt"));
+        services.AddOptions<JwtSettings>()
+            .Bind(configuration.GetSection(JwtSettings.SectionName))
+            .Validate(settings =>
+            {
+                ValidateJwtSettings(settings);
+                return true;
+            })
+            .ValidateOnStart();
+
+        services.AddOptions<IdentitySettings>()
+            .Bind(configuration.GetSection(IdentitySettings.SectionName))
+            .ValidateOnStart();
+
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(
                 configuration.GetConnectionString("DefaultConnection")));
 
         services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
         {
-            options.Password.RequireDigit = true;
-            options.Password.RequireLowercase = true;
-            options.Password.RequireUppercase = true;
-            options.Password.RequireNonAlphanumeric = true;
-            options.Password.RequiredLength = 8;
-            options.User.RequireUniqueEmail = true;
-            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(15);
-            options.Lockout.MaxFailedAccessAttempts = 5;
-            options.Lockout.AllowedForNewUsers = true;
-            options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+            var identitySettings = configuration
+                .GetSection(IdentitySettings.SectionName)
+                .Get<IdentitySettings>() ?? new IdentitySettings();
 
+            options.Password.RequireDigit = identitySettings.PasswordRequireDigit;
+            options.Password.RequireLowercase = identitySettings.PasswordRequireLowercase;
+            options.Password.RequireUppercase = identitySettings.PasswordRequireUppercase;
+            options.Password.RequireNonAlphanumeric = identitySettings.PasswordRequireNonAlphanumeric;
+            options.Password.RequiredLength = identitySettings.PasswordRequiredLength;
+            options.User.RequireUniqueEmail = identitySettings.UserRequireUniqueEmail;
+            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(
+                identitySettings.LockoutDefaultLockoutTimeSpanMinutes);
+            options.Lockout.MaxFailedAccessAttempts = identitySettings.LockoutMaxFailedAccessAttempts;
+            options.Lockout.AllowedForNewUsers = identitySettings.LockoutAllowedForNewUsers;
+            options.User.AllowedUserNameCharacters = identitySettings.AllowedUserNameCharacters;
         })
         .AddEntityFrameworkStores<ApplicationDbContext>()
         .AddDefaultTokenProviders()
         .AddErrorDescriber<CustomIdentityErrorDescriber>();
-        var jwtSettings = configuration.GetSection("Jwt").Get<JwtSettings>()
-            ?? throw new InvalidOperationException("JWT settings are not configured.");
-
-        ValidateJwtSettings(jwtSettings);
 
         services.AddAuthentication(options =>
         {
@@ -55,57 +69,63 @@ public static class DependencyInjection
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
         })
-        .AddJwtBearer(options =>
-        {
-            options.SaveToken = true;
-            options.RequireHttpsMetadata = false;
-            options.TokenValidationParameters = new TokenValidationParameters
-            {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                RequireSignedTokens = true,
-                ValidIssuer = jwtSettings.Issuer,
-                ValidAudience = jwtSettings.Audience,
-                IssuerSigningKey = new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
-                ClockSkew = TimeSpan.Zero,
-                ValidAlgorithms = new[] { SecurityAlgorithms.HmacSha256 }
-            };
-            options.Events = new JwtBearerEvents
-            {
-                OnAuthenticationFailed = context =>
+        .AddJwtBearer();
+
+        services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
+            .PostConfigure<IOptions<JwtSettings>>(
+                (options, jwtSettingsOptions) =>
                 {
-                    var logger = GetJwtLogger(context.HttpContext.RequestServices);
-                    logger.LogWarning("JWT authentication failed: {Error}", context.Exception.Message);
-                    return Task.CompletedTask;
-                },
-                OnTokenValidated = context =>
-                {
-                    var logger = GetJwtLogger(context.HttpContext.RequestServices);
-                    logger.LogInformation("JWT token validated for user {User}", context.Principal?.Identity?.Name);
-                    return Task.CompletedTask;
-                },
-                OnChallenge = context =>
-                {
-                    var logger = GetJwtLogger(context.HttpContext.RequestServices);
-                    logger.LogWarning("JWT challenge triggered for path {Path}", context.HttpContext.Request.Path);
-                    return Task.CompletedTask;
-                }
-            };
-        });
+                    var jwtSettings = jwtSettingsOptions.Value;
+
+                    options.SaveToken = true;
+                    options.RequireHttpsMetadata = false;
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        RequireSignedTokens = true,
+                        ValidIssuer = jwtSettings.Issuer,
+                        ValidAudience = jwtSettings.Audience,
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
+                        ClockSkew = TimeSpan.Zero,
+                        ValidAlgorithms = new[] { SecurityAlgorithms.HmacSha256 }
+                    };
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnAuthenticationFailed = context =>
+                        {
+                            var logger = GetJwtLogger(context.HttpContext.RequestServices);
+                            logger.LogWarning("JWT authentication failed: {Error}", context.Exception.Message);
+                            return Task.CompletedTask;
+                        },
+                        OnTokenValidated = context =>
+                        {
+                            var logger = GetJwtLogger(context.HttpContext.RequestServices);
+                            logger.LogInformation("JWT token validated for user {User}", context.Principal?.Identity?.Name);
+                            return Task.CompletedTask;
+                        },
+                        OnChallenge = context =>
+                        {
+                            var logger = GetJwtLogger(context.HttpContext.RequestServices);
+                            logger.LogWarning("JWT challenge triggered for path {Path}", context.HttpContext.Request.Path);
+                            return Task.CompletedTask;
+                        }
+                    };
+                });
 
         services.AddAuthorization(options =>
         {
-            options.AddPolicy("RequireBossRole", policy =>
-                policy.RequireRole("Boss"));
+            options.AddPolicy(AuthPolicies.RequireBossRole, policy =>
+                policy.RequireRole(Roles.Boss));
 
-            options.AddPolicy("RequireAdminRole", policy =>
-                policy.RequireRole("Admin"));
+            options.AddPolicy(AuthPolicies.RequireAdminRole, policy =>
+                policy.RequireRole(Roles.Admin));
 
-            options.AddPolicy("RequireUserRole", policy =>
-                policy.RequireRole("User"));
+            options.AddPolicy(AuthPolicies.RequireUserRole, policy =>
+                policy.RequireRole(Roles.User));
         });
 
         services.AddScoped<IUserRepository, UserRepository>();
@@ -117,54 +137,49 @@ public static class DependencyInjection
         return services;
     }
 
-    private static ILogger GetJwtLogger(IServiceProvider services)
+private static ILogger GetJwtLogger(IServiceProvider services)
     {
         var factory = services.GetRequiredService<ILoggerFactory>();
-        return factory.CreateLogger("JwtBearer");
+        return factory.CreateLogger(LoggerCategories.JwtBearer);
     }
 
-    private static void ValidateJwtSettings(JwtSettings settings)
+private static void ValidateJwtSettings(JwtSettings settings)
     {
         if (string.IsNullOrWhiteSpace(settings.SecretKey))
         {
             throw new InvalidOperationException(
-                "JWT SecretKey is not configured. Set 'Jwt__SecretKey' in the .env file " +
-                "(or 'Jwt:SecretKey' in appsettings.json) to a value of at least 32 characters (256 bits).");
+                JwtValidationMessages.SecretKeyNotConfigured);
         }
 
-        if (settings.SecretKey.Length < 32)
+        if (settings.SecretKey.Length < TokenConstants.JwtSecretKeyMinLength)
         {
             throw new InvalidOperationException(
-                $"JWT SecretKey is too short ({settings.SecretKey.Length} characters). " +
-                "HS256 requires a key of at least 32 characters (256 bits).");
+                $"{JwtValidationMessages.SecretKeyTooShort} " +
+                $"Current length: {settings.SecretKey.Length} characters.");
         }
 
         if (string.IsNullOrWhiteSpace(settings.Issuer))
         {
             throw new InvalidOperationException(
-                "JWT Issuer is not configured. Set 'Jwt__Issuer' in the .env file " +
-                "(or 'Jwt:Issuer' in appsettings.json).");
+                JwtValidationMessages.IssuerNotConfigured);
         }
 
         if (string.IsNullOrWhiteSpace(settings.Audience))
         {
             throw new InvalidOperationException(
-                "JWT Audience is not configured. Set 'Jwt__Audience' in the .env file " +
-                "(or 'Jwt:Audience' in appsettings.json).");
+                JwtValidationMessages.AudienceNotConfigured);
         }
 
         if (settings.AccessTokenExpirationMinutes <= 0)
         {
             throw new InvalidOperationException(
-                "JWT AccessTokenExpirationMinutes must be greater than zero. " +
-                "Set 'Jwt__AccessTokenExpirationMinutes' in the .env file.");
+                JwtValidationMessages.AccessTokenExpirationInvalid);
         }
 
         if (settings.RefreshTokenExpirationDays <= 0)
         {
             throw new InvalidOperationException(
-                "JWT RefreshTokenExpirationDays must be greater than zero. " +
-                "Set 'Jwt__RefreshTokenExpirationDays' in the .env file.");
+                JwtValidationMessages.RefreshTokenExpirationInvalid);
         }
     }
 }
