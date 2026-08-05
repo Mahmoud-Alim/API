@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using Application.Common.Constants;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -8,7 +9,6 @@ public sealed class PerformanceBehavior<TRequest, TResponse> : IPipelineBehavior
     where TRequest : notnull
 {
     private readonly ILogger<PerformanceBehavior<TRequest, TResponse>> _logger;
-    private const int ThresholdMilliseconds = 500;
 
     public PerformanceBehavior(ILogger<PerformanceBehavior<TRequest, TResponse>> logger)
     {
@@ -28,13 +28,13 @@ public sealed class PerformanceBehavior<TRequest, TResponse> : IPipelineBehavior
 
         stopwatch.Stop();
 
-        if (stopwatch.ElapsedMilliseconds > ThresholdMilliseconds)
+        if (stopwatch.ElapsedMilliseconds > PerformanceConstants.ThresholdMilliseconds)
         {
             _logger.LogWarning(
                 "Long running request {RequestName} took {ElapsedMilliseconds}ms (threshold: {Threshold}ms)",
                 requestName,
                 stopwatch.ElapsedMilliseconds,
-                ThresholdMilliseconds);
+                PerformanceConstants.ThresholdMilliseconds);
         }
 
         return response;

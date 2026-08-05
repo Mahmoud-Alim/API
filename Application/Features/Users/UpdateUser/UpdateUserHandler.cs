@@ -1,4 +1,5 @@
 using Application.Common.Models;
+using Domain.Constants;
 using Domain.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -39,8 +40,8 @@ public sealed class UpdateUserHandler : IRequestHandler<UpdateUserCommand, Resul
                 "User {UserId} was not found for update",
                 request.Id);
 
-            return Result<UserDto>.NotFound(
-                $"User with Id {request.Id} was not found.");
+return Result<UserDto>.NotFound(
+                string.Format(ErrorMessages.UserWithIdNotFoundFormat, request.Id));
         }
 
         user.FirstName = request.FirstName;

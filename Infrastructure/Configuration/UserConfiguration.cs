@@ -1,4 +1,5 @@
-﻿using Domain.Entities;
+﻿﻿using Domain.Entities;
+using Infrastructure.Constants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -9,7 +10,7 @@ namespace Infrastructure.Configuration
     {
         public void Configure(EntityTypeBuilder<User> builder)
         {
-            builder.ToTable("Users");
+            builder.ToTable(DatabaseSchema.UsersTable);
 
             builder.HasKey(u => u.UserId);
 
@@ -18,22 +19,22 @@ namespace Infrastructure.Configuration
 
             builder.Property(u => u.FirstName)
                    .IsRequired()
-                   .HasMaxLength(100);
+                   .HasMaxLength(DatabaseSchema.UserFirstNameMaxLength);
 
             builder.Property(u => u.LastName)
                    .IsRequired()
-                   .HasMaxLength(100);
+                   .HasMaxLength(DatabaseSchema.UserLastNameMaxLength);
 
             builder.Property(u => u.Email)
                    .IsRequired()
-                   .HasMaxLength(255);
+                   .HasMaxLength(DatabaseSchema.UserEmailMaxLength);
 
             builder.HasIndex(u => u.Email)
                    .IsUnique();
 
             builder.Property(u => u.Gender)
                    .IsRequired()
-                   .HasMaxLength(20);
+                   .HasMaxLength(DatabaseSchema.UserGenderMaxLength);
 
             builder.Property(u => u.Active)
                    .IsRequired()

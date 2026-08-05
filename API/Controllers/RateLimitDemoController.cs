@@ -12,9 +12,9 @@ public sealed class RateLimitDemoController : ControllerBase
     [EnableRateLimiting(RateLimiterConstants.PolicyName)]
     [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
-    public ActionResult<string> Get()
+public ActionResult<string> Get()
     {
-        return Ok("Rate limited endpoint reached successfully.");
+        return Ok(ApiErrors.RateLimitEndpointReached);
     }
 }
 

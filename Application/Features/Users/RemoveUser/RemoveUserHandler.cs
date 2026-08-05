@@ -1,4 +1,5 @@
 using Application.Common.Models;
+using Domain.Constants;
 using Domain.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -39,8 +40,8 @@ public sealed class RemoveUserHandler : IRequestHandler<RemoveUserCommand, Resul
                 "User {UserId} was not found for removal",
                 request.Id);
 
-            return Result<bool>.NotFound(
-                $"User with Id {request.Id} was not found.");
+return Result<bool>.NotFound(
+                string.Format(ErrorMessages.UserWithIdNotFoundFormat, request.Id));
         }
 
         _userRepository.Remove(user);

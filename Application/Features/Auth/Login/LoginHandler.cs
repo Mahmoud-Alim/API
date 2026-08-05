@@ -5,8 +5,8 @@ using Domain.Entities;
 using Domain.Interfaces;
 using Domain.Settings;
 using MediatR;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -54,19 +54,19 @@ public sealed class LoginHandler : IRequestHandler<LoginCommand, Result<AuthResp
 if (user is null)
         {
             _logger.LogWarning("Login failed: no user found with email {Email}", request.Email);
-            return Result<AuthResponseDto>.Failure(ErrorMessages.InvalidCredentials, StatusCodes.Status401Unauthorized);
+            return Result<AuthResponseDto>.Failure(ErrorMessages.InvalidCredentials, HttpStatusCodes.Unauthorized);
         }
 
         if (!user.IsActive)
         {
             _logger.LogWarning("Login failed: user {Email} is inactive", request.Email);
-            return Result<AuthResponseDto>.Failure(ErrorMessages.UserInactive, StatusCodes.Status403Forbidden);
+            return Result<AuthResponseDto>.Failure(ErrorMessages.UserInactive, HttpStatusCodes.Forbidden);
         }
 
         if (user.LockoutEnabled && user.LockoutEnd.HasValue && user.LockoutEnd.Value > DateTimeOffset.UtcNow)
         {
             _logger.LogWarning("Login failed: user {Email} is locked out", request.Email);
-            return Result<AuthResponseDto>.Failure(ErrorMessages.UserLockedOut, StatusCodes.Status403Forbidden);
+            return Result<AuthResponseDto>.Failure(ErrorMessages.UserLockedOut, HttpStatusCodes.Forbidden);
         }
 
         var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, lockoutOnFailure: true);
@@ -74,7 +74,7 @@ if (user is null)
         if (!result.Succeeded)
         {
             _logger.LogWarning("Login failed: invalid password for email {Email}", request.Email);
-            return Result<AuthResponseDto>.Failure(ErrorMessages.InvalidCredentials, StatusCodes.Status401Unauthorized);
+            return Result<AuthResponseDto>.Failure(ErrorMessages.InvalidCredentials, HttpStatusCodes.Unauthorized);
         }
 
         var roles = await _userManager.GetRolesAsync(user);

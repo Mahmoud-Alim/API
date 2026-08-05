@@ -3,6 +3,7 @@ using Domain.Entities;
 using Domain.Interfaces;
 using Domain.Settings;
 using Infrastructure.Configuration;
+using Infrastructure.Constants;
 using Infrastructure.IdentityHelper;
 using Infrastructure.implementation;
 using Infrastructure.Services;
@@ -37,9 +38,9 @@ public static class DependencyInjection
             .Bind(configuration.GetSection(IdentitySettings.SectionName))
             .ValidateOnStart();
 
-        services.AddDbContext<ApplicationDbContext>(options =>
+services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(
-                configuration.GetConnectionString("DefaultConnection")));
+                configuration.GetConnectionString(ConnectionStrings.DefaultConnection)));
 
         services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
         {

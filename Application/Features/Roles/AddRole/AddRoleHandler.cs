@@ -1,4 +1,5 @@
 using Application.Common.Models;
+using Domain.Constants;
 using Domain.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -32,9 +33,11 @@ public sealed class AddRoleHandler : IRequestHandler<AddRoleCommand, Result<bool
     {
         _logger.LogInformation("Adding role {RoleName}", request.RoleName);
 
-        if (await _roleManager.RoleExistsAsync(request.RoleName))
+if (await _roleManager.RoleExistsAsync(request.RoleName))
         {
-            return Result<bool>.Failure($"Role '{request.RoleName}' already exists.", 409);
+return Result<bool>.Failure(
+                string.Format(ErrorMessages.RoleAlreadyExistsFormat, request.RoleName),
+                HttpStatusCodes.Conflict);
         }
 
         var role = new IdentityRole<Guid>(request.RoleName)
@@ -47,15 +50,15 @@ public sealed class AddRoleHandler : IRequestHandler<AddRoleCommand, Result<bool
         if (!result.Succeeded)
         {
             var errors = result.Errors.Select(e => e.Description);
-            return Result<bool>.Failure(string.Join("; ", errors), 400);
+            return Result<bool>.Failure(string.Join(ErrorMessages.Separator, errors), HttpStatusCodes.BadRequest);
         }
 
-        var ipAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        var ipAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? ErrorMessages.UnknownIp;
 
         await _auditService.LogAsync(
             Guid.Empty,
-            "AddRole",
-            "IdentityRole",
+            AuditActions.AddRole,
+            EntityNames.IdentityRole,
             role.Id.ToString(),
             null,
             $"Role '{request.RoleName}' created",

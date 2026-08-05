@@ -1,4 +1,5 @@
-﻿using Domain.Entities;
+﻿﻿using Domain.Entities;
+using Infrastructure.Constants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -9,17 +10,17 @@ public class UserJobInfoConfiguration : IEntityTypeConfiguration<UserJobInfo>
 {
     public void Configure(EntityTypeBuilder<UserJobInfo> builder)
     {
-        builder.ToTable("UserJobInfos");
+        builder.ToTable(DatabaseSchema.UserJobInfosTable);
 
         builder.HasKey(x => x.UserId);
 
         builder.Property(x => x.JobTitle)
                .IsRequired()
-               .HasMaxLength(100);
+               .HasMaxLength(DatabaseSchema.JobTitleMaxLength);
 
         builder.Property(x => x.Department)
                .IsRequired()
-               .HasMaxLength(100);
+               .HasMaxLength(DatabaseSchema.DepartmentMaxLength);
 
     }
 }

@@ -40,15 +40,15 @@ public static class ResultExtensions
         return result.ToActionResult(controller);
     }
 
-    private static string GetDefaultTitleForStatusCode(int statusCode) => statusCode switch
+private static string GetDefaultTitleForStatusCode(int statusCode) => statusCode switch
     {
-        StatusCodes.Status400BadRequest => "Bad Request",
-        StatusCodes.Status401Unauthorized => "Unauthorized",
-        StatusCodes.Status403Forbidden => "Forbidden",
-        StatusCodes.Status404NotFound => "Not Found",
-        StatusCodes.Status409Conflict => "Conflict",
-        StatusCodes.Status422UnprocessableEntity => "Unprocessable Entity",
-        StatusCodes.Status500InternalServerError => "Internal Server Error",
-        _ => "Error"
+        StatusCodes.Status400BadRequest => ProblemDetailsTitles.BadRequest,
+        StatusCodes.Status401Unauthorized => ProblemDetailsTitles.Unauthorized,
+        StatusCodes.Status403Forbidden => ProblemDetailsTitles.Forbidden,
+        StatusCodes.Status404NotFound => ProblemDetailsTitles.NotFound,
+        StatusCodes.Status409Conflict => ProblemDetailsTitles.Conflict,
+        StatusCodes.Status422UnprocessableEntity => ProblemDetailsTitles.UnprocessableEntity,
+        StatusCodes.Status500InternalServerError => ProblemDetailsTitles.InternalServerError,
+        _ => ProblemDetailsTitles.Error
     };
 }

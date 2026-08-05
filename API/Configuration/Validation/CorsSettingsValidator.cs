@@ -25,9 +25,9 @@ public sealed class CorsSettingsValidator : IValidateOptions<CorsSettings>
 
     private static void ValidateNotEmpty(string[]? origins, List<string> failures)
     {
-        if (origins is null || origins.Length == 0)
+if (origins is null || origins.Length == 0)
         {
-            failures.Add("Cors:AllowedOrigins must contain at least one origin.");
+            failures.Add(ConfigurationMessages.CorsAllowedOriginsRequired);
         }
     }
 
@@ -35,9 +35,7 @@ public sealed class CorsSettingsValidator : IValidateOptions<CorsSettings>
     {
         if (origins.Contains("*", StringComparer.Ordinal))
         {
-            failures.Add(
-                "Cors:AllowedOrigins must not contain the wildcard '*' origin " +
-                "because AllowCredentials cannot be used with AllowAnyOrigin.");
+            failures.Add(ConfigurationMessages.CorsAllowedOriginsWildcard);
         }
     }
 
@@ -51,8 +49,7 @@ public sealed class CorsSettingsValidator : IValidateOptions<CorsSettings>
         foreach (var index in emptyOrigins)
         {
             failures.Add(
-                $"Cors:AllowedOrigins[{index}] is empty or contains only whitespace. " +
-                "Each origin must be trimmed and non-empty.");
+                string.Format(ConfigurationMessages.CorsAllowedOriginsWhitespaceFormat, index));
         }
     }
 
@@ -69,8 +66,7 @@ public sealed class CorsSettingsValidator : IValidateOptions<CorsSettings>
         foreach (var duplicate in duplicates)
         {
             failures.Add(
-                $"Cors:AllowedOrigins contains a duplicate origin: '{duplicate}'. " +
-                "Each origin must appear only once.");
+                string.Format(ConfigurationMessages.CorsAllowedOriginsDuplicateFormat, duplicate));
         }
     }
 
@@ -88,9 +84,7 @@ public sealed class CorsSettingsValidator : IValidateOptions<CorsSettings>
             if (!IsValidOrigin(trimmed))
             {
                 failures.Add(
-                    $"Cors:AllowedOrigins contains an invalid origin: '{origin}'. " +
-                    "An origin must be an absolute URI with scheme and host only, " +
-                    "and must not contain a path, query string, or fragment.");
+                    string.Format(ConfigurationMessages.CorsAllowedOriginsInvalidFormat, origin));
             }
         }
     }

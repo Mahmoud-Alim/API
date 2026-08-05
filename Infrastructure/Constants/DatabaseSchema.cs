@@ -2,6 +2,13 @@ namespace Infrastructure.Constants;
 
 public static class DatabaseSchema
 {
+    public const string UsersTable = "Users";
+    public const string UserJobInfosTable = "UserJobInfos";
+    public const string UserSalariesTable = "UserSalaries";
+    public const string RefreshTokensTable = "RefreshTokens";
+    public const string AuditLogsTable = "AuditLogs";
+    public const string AspNetUsersTable = "AspNetUsers";
+
     public const string Decimal18_2 = "decimal(18,2)";
 
     public const int UserFirstNameMaxLength = 100;

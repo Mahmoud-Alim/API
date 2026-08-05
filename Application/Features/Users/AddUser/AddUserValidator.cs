@@ -1,3 +1,4 @@
+using Application.Common.Constants;
 using FluentValidation;
 
 namespace Application.Features.Users.AddUser;
@@ -8,32 +9,32 @@ public sealed class AddUserValidator : AbstractValidator<AddUserCommand>
     {
         RuleFor(x => x.FirstName)
             .NotEmpty()
-            .WithMessage("First name is required.")
-            .MinimumLength(3)
-            .MaximumLength(100)
-            .WithMessage("First name must be between 3 and 100 characters.");
+            .WithMessage(ValidationConstants.FirstNameRequiredMessage)
+            .MinimumLength(ValidationConstants.NameMinLength)
+            .MaximumLength(ValidationConstants.NameMaxLength)
+            .WithMessage(ValidationConstants.FirstNameLengthRangeMessage);
 
         RuleFor(x => x.LastName)
             .NotEmpty()
-            .WithMessage("Last name is required.")
-            .MinimumLength(3)
-            .MaximumLength(100)
-            .WithMessage("Last name must be between 3 and 100 characters.");
+            .WithMessage(ValidationConstants.LastNameRequiredMessage)
+            .MinimumLength(ValidationConstants.NameMinLength)
+            .MaximumLength(ValidationConstants.NameMaxLength)
+            .WithMessage(ValidationConstants.LastNameLengthRangeMessage);
 
         RuleFor(x => x.Email)
             .NotEmpty()
-            .WithMessage("Email is required.")
+            .WithMessage(ValidationConstants.EmailRequiredMessage)
             .MaximumLength(200)
-            .WithMessage("Email must not exceed 200 characters.")
+            .WithMessage(ValidationConstants.EmailMaxLength200Message)
             .EmailAddress()
-            .WithMessage("A valid email address is required.");
+            .WithMessage(ValidationConstants.EmailValidMessage);
 
         RuleFor(x => x.Gender)
             .NotEmpty()
-            .WithMessage("Gender is required.")
-            .MinimumLength(4)
-            .MaximumLength(20)
-            .WithMessage("Gender must be between 4 and 20 characters.");
+            .WithMessage(ValidationConstants.GenderRequiredMessage)
+            .MinimumLength(ValidationConstants.GenderMinLength)
+            .MaximumLength(ValidationConstants.GenderMaxLength)
+            .WithMessage(ValidationConstants.GenderLengthRangeMessage);
     }
 }
 

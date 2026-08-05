@@ -50,7 +50,7 @@ public sealed class ExceptionMiddleware
         {
 case ValidationException validationEx:
                 problemDetails.Status = StatusCodes.Status400BadRequest;
-                problemDetails.Title = "Validation Failed";
+                problemDetails.Title = ProblemDetailsTitles.ValidationFailed;
                 problemDetails.Detail = ApiErrors.ValidationFailed;
                 problemDetails.Extensions["errors"] = validationEx.Errors;
 
@@ -62,7 +62,7 @@ case ValidationException validationEx:
 
             case NotFoundException:
                 problemDetails.Status = StatusCodes.Status404NotFound;
-                problemDetails.Title = "Resource Not Found";
+                problemDetails.Title = ProblemDetailsTitles.ResourceNotFound;
                 problemDetails.Detail = exception.Message;
 
                 _logger.LogWarning(
@@ -74,7 +74,7 @@ case ValidationException validationEx:
             case UnauthorizedException:
             case UnauthorizedAccessException:
                 problemDetails.Status = StatusCodes.Status401Unauthorized;
-                problemDetails.Title = "Unauthorized";
+                problemDetails.Title = ProblemDetailsTitles.Unauthorized;
                 problemDetails.Detail = ApiErrors.Unauthorized;
 
                 _logger.LogWarning(
@@ -85,7 +85,7 @@ case ValidationException validationEx:
 
             case ForbiddenException:
                 problemDetails.Status = StatusCodes.Status403Forbidden;
-                problemDetails.Title = "Forbidden";
+                problemDetails.Title = ProblemDetailsTitles.Forbidden;
                 problemDetails.Detail = ApiErrors.Forbidden;
 
                 _logger.LogWarning(
@@ -96,7 +96,7 @@ case ValidationException validationEx:
 
             case ConflictException:
                 problemDetails.Status = StatusCodes.Status409Conflict;
-                problemDetails.Title = "Conflict";
+                problemDetails.Title = ProblemDetailsTitles.Conflict;
                 problemDetails.Detail = exception.Message;
 
                 _logger.LogWarning(
@@ -107,7 +107,7 @@ case ValidationException validationEx:
 
             default:
                 problemDetails.Status = StatusCodes.Status500InternalServerError;
-                problemDetails.Title = "Internal Server Error";
+                problemDetails.Title = ProblemDetailsTitles.InternalServerError;
                 problemDetails.Detail = ApiErrors.UnexpectedError;
 
                 _logger.LogError(

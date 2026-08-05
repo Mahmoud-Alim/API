@@ -138,10 +138,10 @@ public sealed class AuthController : ControllerBase
 
         if (string.IsNullOrEmpty(refreshToken))
         {
-            return BadRequest(new ProblemDetails
+return BadRequest(new ProblemDetails
             {
                 Status = StatusCodes.Status400BadRequest,
-                Title = "Bad Request",
+                Title = ProblemDetailsTitles.BadRequest,
                 Detail = ApiErrors.NoRefreshToken
             });
         }

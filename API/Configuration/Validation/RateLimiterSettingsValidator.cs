@@ -8,39 +8,39 @@ public sealed class RateLimiterSettingsValidator : IValidateOptions<RateLimiterS
     {
         var failures = new List<string>();
 
-        if (options.GlobalPermitLimit <= 0)
+if (options.GlobalPermitLimit <= 0)
         {
-            failures.Add("RateLimiter:GlobalPermitLimit must be greater than zero.");
+            failures.Add(ConfigurationMessages.RateLimiterGlobalPermitLimit);
         }
 
         if (options.GlobalWindowSeconds <= 0)
         {
-            failures.Add("RateLimiter:GlobalWindowSeconds must be greater than zero.");
+            failures.Add(ConfigurationMessages.RateLimiterGlobalWindowSeconds);
         }
 
         if (options.GlobalSegmentsPerWindow <= 0)
         {
-            failures.Add("RateLimiter:GlobalSegmentsPerWindow must be greater than zero.");
+            failures.Add(ConfigurationMessages.RateLimiterGlobalSegmentsPerWindow);
         }
 
         if (options.TokenLimit <= 0)
         {
-            failures.Add("RateLimiter:TokenLimit must be greater than zero.");
+            failures.Add(ConfigurationMessages.RateLimiterTokenLimit);
         }
 
         if (options.TokensPerPeriod <= 0)
         {
-            failures.Add("RateLimiter:TokensPerPeriod must be greater than zero.");
+            failures.Add(ConfigurationMessages.RateLimiterTokensPerPeriod);
         }
 
         if (options.ReplenishmentPeriodSeconds <= 0)
         {
-            failures.Add("RateLimiter:ReplenishmentPeriodSeconds must be greater than zero.");
+            failures.Add(ConfigurationMessages.RateLimiterReplenishmentPeriodSeconds);
         }
 
         if (options.QueueLimit < 0)
         {
-            failures.Add("RateLimiter:QueueLimit must be greater than or equal to zero.");
+            failures.Add(ConfigurationMessages.RateLimiterQueueLimit);
         }
 
         return failures.Count > 0

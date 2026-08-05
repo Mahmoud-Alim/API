@@ -1,4 +1,5 @@
 using Application.Common.Models;
+using Domain.Constants;
 using Domain.Interfaces;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -34,7 +35,8 @@ public sealed class GetUserByIdHandler : IRequestHandler<GetUserByIdQuery, Resul
                 "User {UserId} was not found",
                 request.Id);
 
-            return Result<UserDto>.NotFound($"User with Id {request.Id} was not found.");
+            return Result<UserDto>.NotFound(
+                string.Format(ErrorMessages.UserWithIdNotFoundFormat, request.Id));
         }
 
         var response = new UserDto

@@ -1,4 +1,5 @@
 using Domain.Entities;
+using Infrastructure.Constants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -8,7 +9,7 @@ public class AuditLogConfiguration : IEntityTypeConfiguration<AuditLog>
 {
     public void Configure(EntityTypeBuilder<AuditLog> builder)
     {
-        builder.ToTable("AuditLogs");
+        builder.ToTable(DatabaseSchema.AuditLogsTable);
 
         builder.HasKey(al => al.Id);
 
@@ -17,27 +18,27 @@ public class AuditLogConfiguration : IEntityTypeConfiguration<AuditLog>
 
         builder.Property(al => al.Action)
                .IsRequired()
-               .HasMaxLength(100);
+               .HasMaxLength(DatabaseSchema.AuditActionMaxLength);
 
         builder.Property(al => al.EntityName)
                .IsRequired()
-               .HasMaxLength(100);
+               .HasMaxLength(DatabaseSchema.AuditEntityNameMaxLength);
 
         builder.Property(al => al.EntityId)
-               .HasMaxLength(100);
+               .HasMaxLength(DatabaseSchema.AuditEntityIdMaxLength);
 
         builder.Property(al => al.OldValues)
-               .HasMaxLength(2000);
+               .HasMaxLength(DatabaseSchema.AuditValuesMaxLength);
 
         builder.Property(al => al.NewValues)
-               .HasMaxLength(2000);
+               .HasMaxLength(DatabaseSchema.AuditValuesMaxLength);
 
         builder.Property(al => al.CreatedDate)
                .IsRequired();
 
         builder.Property(al => al.IpAddress)
                .IsRequired()
-               .HasMaxLength(45);
+               .HasMaxLength(DatabaseSchema.IpAddressMaxLength);
 
         builder.HasOne(al => al.User)
                .WithMany()

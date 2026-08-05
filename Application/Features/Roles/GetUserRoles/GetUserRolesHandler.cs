@@ -1,5 +1,6 @@
 using Application.Common.Models;
 using Application.Common.Models.Auth;
+using Domain.Constants;
 using Domain.Entities;
 using Domain.Interfaces;
 using MediatR;
@@ -29,9 +30,9 @@ public sealed class GetUserRolesHandler : IRequestHandler<GetUserRolesQuery, Res
 
         var user = await _userManager.FindByIdAsync(request.UserId.ToString());
 
-        if (user is null)
+if (user is null)
         {
-            return Result<UserRoleDto>.Failure("User not found.", 404);
+            return Result<UserRoleDto>.Failure(ErrorMessages.UserNotFound, HttpStatusCodes.NotFound);
         }
 
         var roles = await _userManager.GetRolesAsync(user);

@@ -22,7 +22,15 @@ public static class ErrorMessages
 
     public const string AdminRoleDoesNotExist = "Admin role does not exist.";
 
-    public const string CannotRemoveBossRole = "Cannot remove the Boss role.";
+public const string CannotRemoveBossRole = "Cannot remove the Boss role.";
 
     public const string UnknownIp = "unknown";
+
+    public const string Separator = "; ";
+
+    public const string UserWithIdNotFoundFormat = "User with Id {0} was not found.";
+
+    public const string RoleAlreadyExistsFormat = "Role '{0}' already exists.";
+
+    public const string RoleDoesNotExistFormat = "Role '{0}' does not exist.";
 }

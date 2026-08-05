@@ -23,6 +23,9 @@ public static class ApiErrors
     public const string NoRefreshToken =
         "No refresh token found in cookies.";
 
-    public const string AnErrorOccurred =
+public const string AnErrorOccurred =
         "An error occurred.";
+
+    public const string RateLimitEndpointReached =
+        "Rate limited endpoint reached successfully.";
 }

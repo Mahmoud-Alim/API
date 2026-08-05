@@ -1,5 +1,6 @@
 using Application.Common.Models;
 using Application.Common.Models.Auth;
+using Domain.Constants;
 using Domain.Entities;
 using Domain.Interfaces;
 using Domain.Settings;
@@ -49,40 +50,40 @@ public sealed class RefreshTokenHandler : IRequestHandler<RefreshTokenCommand, R
     {
         _logger.LogInformation("Refresh token attempt");
 
-        var ipAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+var ipAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? ErrorMessages.UnknownIp;
 
         var principal = GetPrincipalFromExpiredToken(request.AccessToken);
 
         if (principal is null)
         {
-            return Result<AuthResponseDto>.Failure("Invalid token.", 401);
+            return Result<AuthResponseDto>.Failure(ErrorMessages.InvalidToken, HttpStatusCodes.Unauthorized);
         }
 
-        var userIdString = principal.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+        var userIdString = principal.FindFirst(TokenClaimTypes.Sub)?.Value;
         if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
         {
-            return Result<AuthResponseDto>.Failure("Invalid token.", 401);
+            return Result<AuthResponseDto>.Failure(ErrorMessages.InvalidToken, HttpStatusCodes.Unauthorized);
         }
 
         var user = await _userManager.FindByIdAsync(userId.ToString());
 
-        if (user is null || !user.IsActive || user.SecurityStamp != principal.FindFirst("securityStamp")?.Value)
+        if (user is null || !user.IsActive || user.SecurityStamp != principal.FindFirst(TokenClaimTypes.SecurityStamp)?.Value)
         {
-            return Result<AuthResponseDto>.Failure("Invalid token.", 401);
+            return Result<AuthResponseDto>.Failure(ErrorMessages.InvalidToken, HttpStatusCodes.Unauthorized);
         }
 
         var storedRefreshToken = await _refreshTokenRepository.GetByTokenHashAsync(
-            _tokenService.HashToken(_httpContextAccessor.HttpContext?.Request.Cookies["refreshToken"] ?? ""),
+            _tokenService.HashToken(_httpContextAccessor.HttpContext?.Request.Cookies[CookieNames.RefreshToken] ?? string.Empty),
             cancellationToken);
 
         if (storedRefreshToken is null || storedRefreshToken.IsRevoked || storedRefreshToken.ExpirationDate <= DateTime.UtcNow)
         {
-            return Result<AuthResponseDto>.Failure("Invalid refresh token.", 401);
+            return Result<AuthResponseDto>.Failure(ErrorMessages.InvalidRefreshToken, HttpStatusCodes.Unauthorized);
         }
 
         if (storedRefreshToken.UserId != userId)
         {
-            return Result<AuthResponseDto>.Failure("Invalid token.", 401);
+            return Result<AuthResponseDto>.Failure(ErrorMessages.InvalidToken, HttpStatusCodes.Unauthorized);
         }
 
         storedRefreshToken.IsRevoked = true;
@@ -112,10 +113,10 @@ public sealed class RefreshTokenHandler : IRequestHandler<RefreshTokenCommand, R
         var roles = await _userManager.GetRolesAsync(user);
         var newAccessToken = _tokenService.GenerateAccessToken(roles, user.Id, user.UserName!, user.Email!);
 
-        await _auditService.LogAsync(
+await _auditService.LogAsync(
             userId,
-            "TokenRefresh",
-            "RefreshToken",
+            AuditActions.TokenRefresh,
+            EntityNames.RefreshToken,
             newRefreshToken.Id.ToString(),
             $"Old token hash: {storedRefreshToken.TokenHash}",
             $"New token hash: {newRefreshTokenHash}",

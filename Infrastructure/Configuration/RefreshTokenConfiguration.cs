@@ -1,4 +1,5 @@
 using Domain.Entities;
+using Infrastructure.Constants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -8,13 +9,13 @@ public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
 {
     public void Configure(EntityTypeBuilder<RefreshToken> builder)
     {
-        builder.ToTable("RefreshTokens");
+        builder.ToTable(DatabaseSchema.RefreshTokensTable);
 
         builder.HasKey(rt => rt.Id);
 
         builder.Property(rt => rt.TokenHash)
                .IsRequired()
-               .HasMaxLength(64);
+               .HasMaxLength(DatabaseSchema.TokenHashMaxLength);
 
         builder.HasIndex(rt => rt.TokenHash)
                .IsUnique();
@@ -30,13 +31,13 @@ public class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
 
         builder.Property(rt => rt.CreatedByIp)
                .IsRequired()
-               .HasMaxLength(45);
+               .HasMaxLength(DatabaseSchema.IpAddressMaxLength);
 
         builder.Property(rt => rt.RevokedByIp)
-               .HasMaxLength(45);
+               .HasMaxLength(DatabaseSchema.IpAddressMaxLength);
 
         builder.Property(rt => rt.ReplacedByTokenHash)
-               .HasMaxLength(64);
+               .HasMaxLength(DatabaseSchema.TokenHashMaxLength);
 
         builder.HasOne(rt => rt.User)
                .WithMany()

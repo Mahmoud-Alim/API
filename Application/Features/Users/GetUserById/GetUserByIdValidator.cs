@@ -1,3 +1,4 @@
+using Application.Common.Constants;
 using FluentValidation;
 
 namespace Application.Features.Users.GetUserById;
@@ -8,7 +9,7 @@ public sealed class GetUserByIdValidator : AbstractValidator<GetUserByIdQuery>
     {
         RuleFor(x => x.Id)
             .GreaterThan(0)
-            .WithMessage("User Id must be greater than zero.");
+            .WithMessage(ValidationConstants.UserIdGreaterThanZeroMessage);
     }
 }
 

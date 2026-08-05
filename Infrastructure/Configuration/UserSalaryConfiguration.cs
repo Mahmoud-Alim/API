@@ -1,4 +1,5 @@
 ﻿using Domain.Entities;
+using Infrastructure.Constants;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -8,12 +9,12 @@ public class UserSalaryConfiguration : IEntityTypeConfiguration<UserSalary>
 {
     public void Configure(EntityTypeBuilder<UserSalary> builder)
     {
-        builder.ToTable("UserSalaries");
+        builder.ToTable(DatabaseSchema.UserSalariesTable);
 
         builder.HasKey(x => x.UserId);
 
         builder.Property(x => x.Salary)
-               .HasColumnType("decimal(18,2)")
+               .HasColumnType(DatabaseSchema.Decimal18_2)
                .IsRequired();
 
     }

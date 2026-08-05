@@ -1,4 +1,5 @@
 using Application.Common.Models;
+using Domain.Constants;
 using Domain.Entities;
 using Domain.Interfaces;
 using MediatR;
@@ -36,19 +37,19 @@ public sealed class RevokeTokenHandler : IRequestHandler<RevokeTokenCommand, Res
     {
         _logger.LogInformation("Revoke token attempt");
 
-        var ipAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+var ipAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? ErrorMessages.UnknownIp;
         var tokenHash = _tokenService.HashToken(request.Token);
 
         var storedToken = await _refreshTokenRepository.GetByTokenHashAsync(tokenHash, cancellationToken);
 
         if (storedToken is null)
         {
-            return Result<bool>.Failure("Invalid token.", 404);
+            return Result<bool>.Failure(ErrorMessages.InvalidToken, HttpStatusCodes.NotFound);
         }
 
         if (storedToken.IsRevoked)
         {
-            return Result<bool>.Failure("Token already revoked.", 400);
+            return Result<bool>.Failure(ErrorMessages.TokenAlreadyRevoked, HttpStatusCodes.BadRequest);
         }
 
         storedToken.IsRevoked = true;
@@ -57,10 +58,10 @@ public sealed class RevokeTokenHandler : IRequestHandler<RevokeTokenCommand, Res
         _refreshTokenRepository.Update(storedToken);
         await _refreshTokenRepository.SaveChangesAsync(cancellationToken);
 
-        await _auditService.LogAsync(
+await _auditService.LogAsync(
             storedToken.UserId,
-            "TokenRevoke",
-            "RefreshToken",
+            AuditActions.TokenRevoke,
+            EntityNames.RefreshToken,
             storedToken.Id.ToString(),
             $"Token hash: {storedToken.TokenHash}",
             $"Revoked at {DateTime.UtcNow} by IP {ipAddress}",

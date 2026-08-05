@@ -1,3 +1,4 @@
+using Application.Common.Constants;
 using FluentValidation;
 
 namespace Application.Features.Auth.RefreshTokenFeature;
@@ -7,6 +8,6 @@ public sealed class RefreshTokenValidator : AbstractValidator<RefreshTokenComman
     public RefreshTokenValidator()
     {
         RuleFor(x => x.AccessToken)
-            .NotEmpty().WithMessage("Access token is required.");
+            .NotEmpty().WithMessage(ValidationConstants.AccessTokenRequiredMessage);
     }
 }

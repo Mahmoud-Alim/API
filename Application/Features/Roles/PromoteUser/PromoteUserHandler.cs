@@ -1,4 +1,5 @@
 using Application.Common.Models;
+using Domain.Constants;
 using Domain.Entities;
 using Domain.Interfaces;
 using MediatR;
@@ -38,45 +39,45 @@ public sealed class PromoteUserHandler : IRequestHandler<PromoteUserCommand, Res
 
         var user = await _userManager.FindByIdAsync(request.UserId.ToString());
 
-        if (user is null)
+if (user is null)
         {
-            return Result<bool>.Failure("User not found.", 404);
+            return Result<bool>.Failure(ErrorMessages.UserNotFound, HttpStatusCodes.NotFound);
         }
 
         var currentRoles = await _userManager.GetRolesAsync(user);
 
-        if (currentRoles.Contains("Boss"))
+if (currentRoles.Contains(Domain.Constants.Roles.Boss))
         {
-            return Result<bool>.Failure("Cannot modify Boss users.", 403);
+            return Result<bool>.Failure(ErrorMessages.CannotModifyBoss, HttpStatusCodes.Forbidden);
         }
 
-        if (currentRoles.Contains("Admin"))
+        if (currentRoles.Contains(Domain.Constants.Roles.Admin))
         {
-            return Result<bool>.Failure("User is already an Admin.", 400);
+            return Result<bool>.Failure(ErrorMessages.UserAlreadyAdmin, HttpStatusCodes.BadRequest);
         }
 
-        if (!await _roleManager.RoleExistsAsync("Admin"))
+        if (!await _roleManager.RoleExistsAsync(Domain.Constants.Roles.Admin))
         {
-            return Result<bool>.Failure("Admin role does not exist.", 404);
+            return Result<bool>.Failure(ErrorMessages.AdminRoleDoesNotExist, HttpStatusCodes.NotFound);
         }
 
-        var result = await _userManager.AddToRoleAsync(user, "Admin");
+        var result = await _userManager.AddToRoleAsync(user, Domain.Constants.Roles.Admin);
 
         if (!result.Succeeded)
         {
             var errors = result.Errors.Select(e => e.Description);
-            return Result<bool>.Failure(string.Join("; ", errors), 400);
+            return Result<bool>.Failure(string.Join(ErrorMessages.Separator, errors), HttpStatusCodes.BadRequest);
         }
 
-        var ipAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        var ipAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? ErrorMessages.UnknownIp;
 
         await _auditService.LogAsync(
             request.UserId,
-            "PromoteUser",
-            "ApplicationUser",
+            AuditActions.PromoteUser,
+            EntityNames.ApplicationUser,
             request.UserId.ToString(),
             $"Roles: {string.Join(", ", currentRoles)}",
-            $"Roles: {string.Join(", ", currentRoles.Append("Admin"))}",
+$"Roles: {string.Join(", ", currentRoles.Append(Domain.Constants.Roles.Admin))}",
             ipAddress,
             cancellationToken);
 

@@ -1,3 +1,5 @@
+using Domain.Constants;
+
 namespace Application.Common.Models;
 
 public sealed class Result<T>
@@ -29,10 +31,10 @@ public sealed class Result<T>
 
     public static Result<T> Success(T data) => new(data);
 
-    public static Result<T> Failure(string error, int statusCode = 400) => new(error, statusCode);
+    public static Result<T> Failure(string error, int statusCode = HttpStatusCodes.BadRequest) => new(error, statusCode);
 
-    public static Result<T> NotFound(string error) => new(error, 404);
+    public static Result<T> NotFound(string error) => new(error, HttpStatusCodes.NotFound);
 
-    private static int GetDefaultSuccessStatusCode() => 200;
+    private static int GetDefaultSuccessStatusCode() => HttpStatusCodes.Ok;
 }
 

@@ -1,4 +1,5 @@
 using Domain.Entities;
+using Infrastructure.Constants;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -9,13 +10,13 @@ public class ApplicationUserConfiguration : IEntityTypeConfiguration<Application
 {
     public void Configure(EntityTypeBuilder<ApplicationUser> builder)
     {
-        builder.ToTable("AspNetUsers");
+        builder.ToTable(DatabaseSchema.AspNetUsersTable);
 
         builder.Property(u => u.FirstName)
-               .HasMaxLength(100);
+               .HasMaxLength(DatabaseSchema.UserFirstNameMaxLength);
 
         builder.Property(u => u.LastName)
-               .HasMaxLength(100);
+               .HasMaxLength(DatabaseSchema.UserLastNameMaxLength);
 
         builder.Property(u => u.CreatedAt)
                .IsRequired();

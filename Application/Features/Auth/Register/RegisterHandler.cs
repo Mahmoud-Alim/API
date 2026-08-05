@@ -1,5 +1,6 @@
 using Application.Common.Models;
 using Application.Common.Models.Auth;
+using Domain.Constants;
 using Domain.Entities;
 using Domain.Interfaces;
 using Domain.Settings;
@@ -62,22 +63,24 @@ public sealed class RegisterHandler : IRequestHandler<RegisterCommand, Result<Au
         if (!createResult.Succeeded)
         {
             var errors = createResult.Errors.Select(e => e.Description);
-            return Result<AuthResponseDto>.Failure(string.Join("; ", errors), 400);
+            return Result<AuthResponseDto>.Failure(
+                string.Join(ErrorMessages.Separator, errors),
+                HttpStatusCodes.BadRequest);
         }
 
-        if (!await _roleManager.RoleExistsAsync("User"))
+if (!await _roleManager.RoleExistsAsync(Domain.Constants.Roles.User))
         {
-            await _roleManager.CreateAsync(new IdentityRole<Guid>("User"));
+            await _roleManager.CreateAsync(new IdentityRole<Guid>(Domain.Constants.Roles.User));
         }
 
-        await _userManager.AddToRoleAsync(user, "User");
+        await _userManager.AddToRoleAsync(user, Domain.Constants.Roles.User);
 
-        var roles = new[] { "User" };
+        var roles = new[] { Domain.Constants.Roles.User };
         var accessToken = _tokenService.GenerateAccessToken(roles, user.Id, user.UserName!, user.Email!);
         var refreshTokenValue = _tokenService.GenerateRefreshToken();
         var refreshTokenHash = _tokenService.HashToken(refreshTokenValue);
 
-        var ipAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        var ipAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? ErrorMessages.UnknownIp;
 
         var refreshToken = new RefreshToken
         {
@@ -94,13 +97,13 @@ public sealed class RegisterHandler : IRequestHandler<RegisterCommand, Result<Au
         await _refreshTokenRepository.AddAsync(refreshToken, cancellationToken);
         await _refreshTokenRepository.SaveChangesAsync(cancellationToken);
 
-        await _auditService.LogAsync(
+await _auditService.LogAsync(
             user.Id,
-            "UserRegistration",
-            "ApplicationUser",
+            AuditActions.UserRegistration,
+            EntityNames.ApplicationUser,
             user.Id.ToString(),
             null,
-            $"User {user.Email} registered with User role",
+            $"User {user.Email} registered with {Domain.Constants.Roles.User} role",
             ipAddress,
             cancellationToken);
 

@@ -1,4 +1,5 @@
 using Application.Common.Models;
+using Domain.Constants;
 using Domain.Interfaces;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -34,14 +35,16 @@ public sealed class RemoveRoleHandler : IRequestHandler<RemoveRoleCommand, Resul
 
         var role = await _roleManager.FindByNameAsync(request.RoleName);
 
-        if (role is null)
+if (role is null)
         {
-            return Result<bool>.Failure($"Role '{request.RoleName}' does not exist.", 404);
+return Result<bool>.Failure(
+                string.Format(ErrorMessages.RoleDoesNotExistFormat, request.RoleName),
+                HttpStatusCodes.NotFound);
         }
 
-        if (request.RoleName.Equals("Boss", StringComparison.OrdinalIgnoreCase))
+        if (request.RoleName.Equals(Domain.Constants.Roles.Boss, StringComparison.OrdinalIgnoreCase))
         {
-            return Result<bool>.Failure("Cannot remove the Boss role.", 403);
+            return Result<bool>.Failure(ErrorMessages.CannotRemoveBossRole, HttpStatusCodes.Forbidden);
         }
 
         var result = await _roleManager.DeleteAsync(role);
@@ -49,18 +52,18 @@ public sealed class RemoveRoleHandler : IRequestHandler<RemoveRoleCommand, Resul
         if (!result.Succeeded)
         {
             var errors = result.Errors.Select(e => e.Description);
-            return Result<bool>.Failure(string.Join("; ", errors), 400);
+            return Result<bool>.Failure(string.Join(ErrorMessages.Separator, errors), HttpStatusCodes.BadRequest);
         }
 
-        var ipAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+        var ipAddress = _httpContextAccessor.HttpContext?.Connection.RemoteIpAddress?.ToString() ?? ErrorMessages.UnknownIp;
 
         await _auditService.LogAsync(
             Guid.Empty,
-            "RemoveRole",
-            "IdentityRole",
+            AuditActions.RemoveRole,
+            EntityNames.IdentityRole,
             role.Id.ToString(),
-            $"Role '{request.RoleName}' existed",
-            "Role deleted",
+$"Role '{request.RoleName}' existed",
+            AuditMessages.RoleDeleted,
             ipAddress,
             cancellationToken);
 
